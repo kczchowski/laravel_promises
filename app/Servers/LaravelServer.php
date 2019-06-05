@@ -91,7 +91,7 @@ class LaravelServer
                 if($reason instanceof SuccessResolve){
                     $response = $this->makeSuccessResponse([
                         'status' => 'ok',
-                        'response' => $reason->getRequest()
+                        'response' => $reason->getRequest()->getPacket()
                     ]);
                 }else{
                     $response = $this->makeSuccessResponse([

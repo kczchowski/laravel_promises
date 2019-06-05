@@ -6,6 +6,7 @@ use App\Coffee\RequestFactory;
 use App\Promises\RejectResolve;
 use App\Promises\SuccessResolve;
 use React\Promise\Deferred;
+use React\Promise\Promise;
 use React\Socket\ConnectionInterface;
 
 /**
@@ -54,7 +55,7 @@ class Connection
         $this->rawConnection->write($data . PHP_EOL);
     }
 
-    public function send(CommandContract $command)
+    public function send(CommandContract $command): Promise
     {
         $deferred = new Deferred();
         $promise = $deferred->promise();
@@ -66,17 +67,20 @@ class Connection
             $timer = $loop->addTimer(30, function () use ($deferred) {
                 $deferred->reject(new RejectResolve("Command timed out, client did not respond in time!"));
             });
+
             $resolvedBy = $command->resolveUsing();
 
-            if($resolvedBy != null and class_exists($resolvedBy)){
+            if(class_exists($resolvedBy)){
                 $this->handler->register($resolvedBy, function (RequestContract $frame) use ($deferred, &$timer) {
                     $deferred->resolve(new SuccessResolve($frame));
-                    $timer->cancel();
+                    unset($timer);
                 });
             }
         }else{
             $deferred->resolve("Request sent!");
         }
+
+        $this->write($command->getPayload());
 
         return $promise;
     }

@@ -12,7 +12,7 @@ class StatusCommand implements CommandContract
 
     protected $target;
 
-    public function __construct($target, $payload)
+    public function __construct($target, $payload = '')
     {
         $this->payload = $payload;
         $this->target = $payload;
@@ -21,6 +21,11 @@ class StatusCommand implements CommandContract
     public function resolveUsing(): ?string
     {
         return StatusRequest::class;
+    }
+
+    public function getPayload(): string
+    {
+        return $this->payload;
     }
 
 }

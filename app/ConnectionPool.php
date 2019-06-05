@@ -26,12 +26,12 @@ class ConnectionPool
 
     public function getConnection(string $remoteAddress): Connection
     {
-        return $this->connections->get($remoteAddress);
+        return $this->connections->get("tcp://" . $remoteAddress);
     }
 
     public function hasConnection(string $remoteAddress): bool
     {
-        return $this->connections->has($remoteAddress);
+        return $this->connections->has("tcp://" . $remoteAddress);
     }
 
 }
